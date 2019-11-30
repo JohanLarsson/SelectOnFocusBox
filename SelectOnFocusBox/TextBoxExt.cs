@@ -22,7 +22,7 @@
             EventManager.RegisterClassHandler(typeof(TextBox), UIElement.PreviewMouseLeftButtonDownEvent, new MouseButtonEventHandler(OnPreviewMouseLeftButtonDown));
             EventManager.RegisterClassHandler(typeof(TextBoxBase), UIElement.GotKeyboardFocusEvent, new RoutedEventHandler(Select));
             EventManager.RegisterClassHandler(typeof(TextBoxBase), UIElement.MouseUpEvent, new RoutedEventHandler(Dump), handledEventsToo: true);
-            EventManager.RegisterClassHandler(typeof(TextBoxBase), UIElement.PreviewMouseUpEvent, new RoutedEventHandler(MouseUp), handledEventsToo: true);
+            EventManager.RegisterClassHandler(typeof(TextBoxBase), UIElement.PreviewMouseUpEvent, new RoutedEventHandler(Dump), handledEventsToo: true);
             EventManager.RegisterClassHandler(typeof(TextBoxBase), TextBoxBase.SelectionChangedEvent, new RoutedEventHandler(Dump), handledEventsToo: true);
             EventManager.RegisterClassHandler(typeof(TextBoxBase), UIElement.GotFocusEvent, new RoutedEventHandler(Dump), handledEventsToo: true);
         }
@@ -65,16 +65,6 @@
                 textBoxBase.Focus())
             {
                 e.Handled = true;
-            }
-        }
-
-        private static void MouseUp(object sender, RoutedEventArgs e)
-        {
-            Dump(e);
-            if (sender is TextBoxBase textBoxBase &&
-                textBoxBase.GetSelectAllOnGotKeyboardFocus())
-            {
-                //textBoxBase.EndChange();
             }
         }
 
