@@ -20,11 +20,11 @@
         static TextBoxExt()
         {
             EventManager.RegisterClassHandler(typeof(TextBox), UIElement.PreviewMouseLeftButtonDownEvent, new MouseButtonEventHandler(OnPreviewMouseLeftButtonDown));
-            EventManager.RegisterClassHandler(typeof(TextBoxBase), UIElement.GotKeyboardFocusEvent, new RoutedEventHandler(Select));
-            EventManager.RegisterClassHandler(typeof(TextBoxBase), UIElement.MouseUpEvent, new RoutedEventHandler(Dump), handledEventsToo: true);
-            EventManager.RegisterClassHandler(typeof(TextBoxBase), UIElement.PreviewMouseUpEvent, new RoutedEventHandler(Dump), handledEventsToo: true);
-            EventManager.RegisterClassHandler(typeof(TextBoxBase), TextBoxBase.SelectionChangedEvent, new RoutedEventHandler(Dump), handledEventsToo: true);
-            EventManager.RegisterClassHandler(typeof(TextBoxBase), UIElement.GotFocusEvent, new RoutedEventHandler(Dump), handledEventsToo: true);
+            EventManager.RegisterClassHandler(typeof(TextBox), UIElement.GotKeyboardFocusEvent, new RoutedEventHandler(OnGotKeyboardFocus));
+            EventManager.RegisterClassHandler(typeof(TextBox), UIElement.MouseUpEvent, new RoutedEventHandler(Dump), handledEventsToo: true);
+            EventManager.RegisterClassHandler(typeof(TextBox), UIElement.PreviewMouseUpEvent, new RoutedEventHandler(Dump), handledEventsToo: true);
+            EventManager.RegisterClassHandler(typeof(TextBox), TextBoxBase.SelectionChangedEvent, new RoutedEventHandler(Dump), handledEventsToo: true);
+            EventManager.RegisterClassHandler(typeof(TextBox), UIElement.GotFocusEvent, new RoutedEventHandler(Dump), handledEventsToo: true);
         }
 
         public static void SetSelectAllOnGotKeyboardFocus(this UIElement element, bool value)
@@ -47,24 +47,44 @@
             return (bool)element.GetValue(SelectAllOnGotKeyboardFocusProperty);
         }
 
-        private static void Select(object sender, RoutedEventArgs e)
+        private static void OnGotKeyboardFocus(object sender, RoutedEventArgs e)
         {
-            Dump(e);
             if (sender is TextBoxBase textBoxBase &&
+                HasText() &&
                 textBoxBase.GetSelectAllOnGotKeyboardFocus())
             {
                 textBoxBase.SelectAll();
             }
+
+            bool HasText()
+            {
+                if (sender is System.Windows.Controls.TextBox textBox)
+                {
+                    return !string.IsNullOrEmpty(textBox.Text);
+                }
+
+                return true;
+            }
         }
 
-        private static void OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private static void OnPreviewMouseLeftButtonDown(object sender, RoutedEventArgs e)
         {
-            Dump(e);
             if (sender is TextBoxBase { IsKeyboardFocusWithin: false, IsEnabled: true, Focusable: true } textBoxBase &&
                 textBoxBase.GetSelectAllOnGotKeyboardFocus() &&
+                HasText() &&
                 textBoxBase.Focus())
             {
                 e.Handled = true;
+            }
+
+            bool HasText()
+            {
+                if (sender is System.Windows.Controls.TextBox textBox)
+                {
+                    return !string.IsNullOrEmpty(textBox.Text);
+                }
+
+                return true;
             }
         }
 
