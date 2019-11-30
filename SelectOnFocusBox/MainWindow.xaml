@@ -9,7 +9,7 @@
     Width="800"
     Height="450"
     mc:Ignorable="d">
-    <StackPanel local:TextBox.SelectAllOnGotKeyboardFocus="True" KeyboardNavigation.TabNavigation="Cycle">
+    <StackPanel local:TextBoxExt.SelectAllOnGotKeyboardFocus="True" KeyboardNavigation.TabNavigation="Cycle">
         <TextBox Text="abc" />
         <TextBox Text="def" />
     </StackPanel>
