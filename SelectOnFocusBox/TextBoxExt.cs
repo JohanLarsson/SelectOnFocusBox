@@ -17,8 +17,8 @@
                 false,
                 FrameworkPropertyMetadataOptions.Inherits));
 
-        private static readonly DependencyProperty SelectingProperty = DependencyProperty.RegisterAttached(
-            "Selecting",
+        private static readonly DependencyProperty IsSelectingProperty = DependencyProperty.RegisterAttached(
+            "IsSelecting",
             typeof(bool),
             typeof(TextBoxExt),
             new PropertyMetadata(default(bool)));
@@ -68,7 +68,10 @@
             {
                 Debug.WriteLine("OnGotKeyboardFocus SelectAll");
                 textBoxBase.SelectAll();
-                textBoxBase.SetValue(SelectingProperty, true);
+                if (Mouse.LeftButton == MouseButtonState.Pressed)
+                {
+                    textBoxBase.SetValue(IsSelectingProperty, true);
+                }
             }
 
             Dump(e);
@@ -89,12 +92,12 @@
             Dump(e);
             if (sender is TextBoxBase textBoxBase &&
                 textBoxBase.GetSelectAllOnGotKeyboardFocus() &&
-                (bool)textBoxBase.GetValue(SelectingProperty))
+                (bool)textBoxBase.GetValue(IsSelectingProperty))
             {
                 Debug.WriteLine("OnMouseUp Handled = true");
                 e.Handled = true;
                 textBoxBase.ReleaseMouseCapture();
-                textBoxBase.SetValue(SelectingProperty, false);
+                textBoxBase.SetValue(IsSelectingProperty, false);
             }
         }
 
@@ -107,7 +110,7 @@
         {
             if (e.Source is System.Windows.Controls.TextBox source)
             {
-                Debug.WriteLine($"IsFocused: {source.IsFocused,-6} IsKeyboardFocused: {source.IsKeyboardFocused,-6} Handled: {e.Handled,-6} SelectedText: {source.SelectedText,-4} {e.RoutedEvent.Name}");
+                Debug.WriteLine($"{e.RoutedEvent.Name,-26} {e.Source.GetType().Name}/{e.OriginalSource.GetType().Name,-11} IsFocused: {source.IsFocused,-6} IsKeyboardFocused: {source.IsKeyboardFocused,-6} Handled: {e.Handled,-6} SelectedText: {source.SelectedText,-4}");
             }
         }
     }
