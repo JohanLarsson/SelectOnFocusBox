@@ -17,18 +17,24 @@
                 false,
                 FrameworkPropertyMetadataOptions.Inherits));
 
+        private static readonly DependencyProperty SelectingProperty = DependencyProperty.RegisterAttached(
+            "Selecting",
+            typeof(bool),
+            typeof(TextBoxExt),
+            new PropertyMetadata(default(bool)));
+
         static TextBoxExt()
         {
             EventManager.RegisterClassHandler(typeof(TextBox), UIElement.GotKeyboardFocusEvent, new RoutedEventHandler(OnGotKeyboardFocus));
             EventManager.RegisterClassHandler(typeof(TextBox), UIElement.GotFocusEvent, new RoutedEventHandler(Dump), handledEventsToo: true);
-            EventManager.RegisterClassHandler(typeof(TextBox), TextBoxBase.SelectionChangedEvent, new RoutedEventHandler(OnSelectionChanged), handledEventsToo: true);
+            EventManager.RegisterClassHandler(typeof(TextBox), TextBoxBase.SelectionChangedEvent, new RoutedEventHandler(Dump), handledEventsToo: true);
 
             EventManager.RegisterClassHandler(typeof(TextBox), UIElement.PreviewMouseDownEvent, new RoutedEventHandler(Dump), handledEventsToo: true);
-            EventManager.RegisterClassHandler(typeof(TextBox), UIElement.PreviewMouseLeftButtonDownEvent, new MouseButtonEventHandler(OnPreviewMouseLeftButtonDown));
+            EventManager.RegisterClassHandler(typeof(TextBox), UIElement.PreviewMouseLeftButtonDownEvent, new MouseButtonEventHandler(Dump));
             EventManager.RegisterClassHandler(typeof(TextBox), UIElement.MouseLeftButtonDownEvent, new RoutedEventHandler(Dump), handledEventsToo: true);
             EventManager.RegisterClassHandler(typeof(TextBox), UIElement.MouseDownEvent, new RoutedEventHandler(Dump), handledEventsToo: true);
             EventManager.RegisterClassHandler(typeof(TextBox), UIElement.PreviewMouseUpEvent, new RoutedEventHandler(Dump), handledEventsToo: true);
-            EventManager.RegisterClassHandler(typeof(TextBox), UIElement.MouseUpEvent, new RoutedEventHandler(Dump), handledEventsToo: true);
+            EventManager.RegisterClassHandler(typeof(TextBox), UIElement.MouseUpEvent, new RoutedEventHandler(OnMouseUp), handledEventsToo: true);
             EventManager.RegisterClassHandler(typeof(TextBox), UIElement.PreviewMouseLeftButtonUpEvent, new RoutedEventHandler(Dump), handledEventsToo: true);
             EventManager.RegisterClassHandler(typeof(TextBox), UIElement.MouseLeftButtonUpEvent, new RoutedEventHandler(Dump), handledEventsToo: true);
 
@@ -60,7 +66,9 @@
                 HasText() &&
                 textBoxBase.GetSelectAllOnGotKeyboardFocus())
             {
+                Debug.WriteLine("OnGotKeyboardFocus SelectAll");
                 textBoxBase.SelectAll();
+                textBoxBase.SetValue(SelectingProperty, true);
             }
 
             Dump(e);
@@ -76,35 +84,17 @@
             }
         }
 
-        private static void OnSelectionChanged(object sender, RoutedEventArgs e)
+        private static void OnMouseUp(object sender, RoutedEventArgs e)
         {
-            if (sender is TextBox { IsLoaded: true })
-            {
-                // Debugger.Break();
-                Dump(e);
-            }
-        }
-
-        private static void OnPreviewMouseLeftButtonDown(object sender, RoutedEventArgs e)
-        {
-            if (sender is TextBoxBase { IsKeyboardFocusWithin: false, IsEnabled: true, Focusable: true } textBoxBase &&
+            Dump(e);
+            if (sender is TextBoxBase textBoxBase &&
                 textBoxBase.GetSelectAllOnGotKeyboardFocus() &&
-                HasText() &&
-                textBoxBase.Focus())
+                (bool)textBoxBase.GetValue(SelectingProperty))
             {
+                Debug.WriteLine("OnMouseUp Handled = true");
                 e.Handled = true;
-            }
-
-            Dump(e);
-
-            bool HasText()
-            {
-                if (sender is System.Windows.Controls.TextBox textBox)
-                {
-                    return !string.IsNullOrEmpty(textBox.Text);
-                }
-
-                return true;
+                textBoxBase.ReleaseMouseCapture();
+                textBoxBase.SetValue(SelectingProperty, false);
             }
         }
 

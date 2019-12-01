@@ -6,8 +6,8 @@
     xmlns:local="clr-namespace:SelectOnFocusBox"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="MainWindow"
-    Width="800"
-    Height="450"
+    Width="200"
+    SizeToContent="Height"
     mc:Ignorable="d">
     <StackPanel local:TextBoxExt.SelectAllOnGotKeyboardFocus="True" KeyboardNavigation.TabNavigation="Cycle">
         <TextBox Text="abc" />
